@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Topper Study Notes: Mechanism of Internet</title>
+    <!-- Tailwind CSS for layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for handwriting realism -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@400;700&family=Kalam:wght@300;400;700&family=Gochi_Hand&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --ink-blue: #1c3d70;
+            --ink-black: #212529;
+            --ink-violet: #4a154b;
+            --ink-color: var(--ink-blue);
+            --red-pen: #c9183b;
+        }
+        header {
+            background: rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        body {
+            background-color: #0c0f17;
+            color: #f4f4f5;
+            font-family: system-ui, -apple-system, sans-serif;
+            background-image: radial-gradient(circle, #1e293b 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Handwritten Styles */
+        .handwritten {
+            font-family: 'Kalam', cursive;
+            font-weight: 400;
+            color: var(--ink-color);
+            transition: color 0.3s ease;
+        }
+
+        .handwritten-bold {
+            font-family: 'Kalam', cursive;
+            font-weight: 700;
+            color: var(--ink-color);
+        }
+
+        .handwritten-sketchy {
+            font-family: 'Caveat', cursive;
+            font-weight: 700;
+            color: var(--red-pen);
+        }
+
+        .label-font {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 0.85rem;
+            color: var(--ink-color);
+        }
+
+        /* 3D Realistic Notebook Sheet */
+        .notebook-outer {
+            perspective: 1500px;
+        }
+
+        .notebook-page {
+            width: 100%;
+            max-width: 850px;
+            min-height: 1150px;
+            background-color: #fdfdfa;
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.6),
+                0 2px 5px rgba(0,0,0,0.3),
+                inset 0 0 45px rgba(0, 0, 0, 0.05);
+            border-radius: 4px 20px 20px 4px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+            border-left: 14px solid #d4d3c4;
+        }
+
+        /* Notebook Ruled Lines */
+        .ruled-paper {
+            background-image: 
+                /* Red vertical margin line */
+                linear-gradient(90deg, transparent 84px, rgba(220, 38, 38, 0.5) 84px, rgba(220, 38, 38, 0.5) 86px, transparent 86px),
+                /* Blue horizontal writing lines */
+                repeating-linear-gradient(transparent, transparent 27px, rgba(162, 199, 230, 0.45) 27px, rgba(162, 199, 230, 0.45) 28px);
+            background-size: 100% 100%, 100% 28px;
+            line-height: 28px;
+            padding: 60px 50px 60px 105px;
+        }
+
+        /* Binder Ring Holes */
+        .binder-holes {
+            position: absolute;
+            left: 24px;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 50px 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .binder-hole {
+            width: 14px;
+            height: 14px;
+            background-color: #0c0f17;
+            border-radius: 50%;
+            box-shadow: inset 3px 3px 5px rgba(0,0,0,0.9), 1px 1px 1px rgba(255,255,255,0.15);
+        }
+
+        /* Yellow Neon Highlighter */
+        .highlight {
+            background: linear-gradient(104deg, rgba(253, 224, 71, 0.85) 0%, rgba(253, 224, 71, 0.95) 75%, rgba(253, 224, 71, 0.55) 100%);
+            border-radius: 4px 10px 5px 8px;
+            padding: 1px 5px 2px 5px;
+            margin: 0 -2px;
+            display: inline;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Active Recall Blackout Mode */
+        .study-hide .highlight {
+            background: #1e293b !important;
+            color: #1e293b !important;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+            border: 1px dashed rgba(253, 224, 71, 0.4);
+        }
+
+        .study-hide .highlight:hover {
+            background: rgba(253, 224, 71, 0.2) !important;
+            color: #475569 !important;
+        }
+
+        /* Red Pen Underline */
+        .red-underline {
+            border-bottom: 2px dashed var(--red-pen);
+            padding-bottom: 1px;
+        }
+
+        /* Red Pen Circling */
+        .red-circle {
+            position: relative;
+            z-index: 1;
+            padding: 2px 6px;
+        }
+
+        .red-circle::before {
+            content: "";
+            position: absolute;
+            left: -3px;
+            top: -1px;
+            right: -3px;
+            bottom: -3px;
+            border: 2px solid var(--red-pen);
+            border-radius: 54% 46% 52% 48% / 44% 56% 44% 56%;
+            transform: rotate(-1.2deg);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Real desk paper curl shadows */
+        .paper-curl-shadow {
+            box-shadow: 
+                0 20px 45px rgba(0, 0, 0, 0.5),
+                inset 12px 0 24px rgba(0,0,0,0.03),
+                inset -12px 0 24px rgba(0,0,0,0.02);
+        }
+
+        .hand-drawn-box {
+            border: 2px solid var(--ink-color);
+            border-radius: 250px 15px 220px 20px/15px 220px 18px 250px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.45);
+        }
+
+        .tilted-page-1 { transform: rotate(-0.3deg) translate(-1px, 1px); }
+        .tilted-page-2 { transform: rotate(0.4deg) translate(2px, -1px); }
+        .tilted-page-3 { transform: rotate(-0.2deg) translate(-2px, 2px); }
+        .tilted-page-4 { transform: rotate(0.3deg) translate(1px, -2px); }
+        .tilted-page-5 { transform: rotate(-0.4deg) translate(-3px, 1px); }
+    </style>
+</head>
+<body class="min-h-screen pb-16">
+
+    <!-- Premium Interactive Header -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-6 py-4 shadow-2xl">
+    <div class="max-w-7xl mx-auto flex flex-col xl:flex-row items-center justify-between gap-4">
+
+        <div class="flex items-center gap-3">
+            <span class="text-3xl">📓</span>
+            <div>
+                <h1 class="text-lg font-bold text-white tracking-wide uppercase">
+                    STUDYBUDDY PRO: MECHANISM OF INTERNET
+                </h1>
+                <p class="text-xs text-slate-400">
+                    Computer Revision Handbook • Source File Reference:
+                    <span class="font-mono text-yellow-400">Internet.pdf</span>
+                </p>
+            </div>
+        </div>
+
+        <button onclick="toggleStudyMode()" id="study-toggle"
+            class="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-slate-950 rounded-lg text-sm font-bold transition-all shadow-lg flex items-center gap-2">
+            <span>💡</span> Active Recall: OFF
+        </button>
+
+        <div class="bg-slate-800 rounded-lg p-1 flex items-center border border-slate-700 shadow-md">
+            <button onclick="navigatePage(-1)"
+                class="px-3 py-1 text-white hover:bg-slate-700 rounded-md text-sm font-bold transition-all">&larr;</button>
+
+            <select id="page-select"
+                onchange="switchPage(parseInt(this.value))"
+                class="bg-slate-800 text-white font-semibold text-xs px-2 py-1 outline-none cursor-pointer">
+                <option value="1">Page 1: How Internet Works</option>
+                <option value="2">Page 2: Protocols, IP & DNS</option>
+                <option value="3">Page 3: Three Pillars & Web Links</option>
+                <option value="4">Page 4: URL Anatomy & Semantics</option>
+                <option value="5">Page 5: Web Servers, Intranet vs Extranet</option>
+            </select>
+
+            <button onclick="navigatePage(1)"
+                class="px-3 py-1 text-white hover:bg-slate-700 rounded-md text-sm font-bold transition-all">&rarr;</button>
+        </div>
+
+        <button onclick="toggleScanLook()" id="scan-toggle"
+            class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm border border-slate-700 transition-all font-semibold flex items-center gap-2">
+            <span>🖨️</span> Scan Look
+        </button>
+
+    </div>
+    </header>
+    <!-- Interactive Ruled Notebook Space -->
+    <main class="max-w-5xl mx-auto px-4 mt-8">
+        
+        <div class="flex justify-center items-center notebook-outer py-4">
+
+            <!-- PAGE 1: HOW THE INTERNET WORKS -->
+            <div id="page-1" class="notebook-page paper-curl-shadow tilted-page-1 block">
+                <div class="binder-holes">
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                </div>
+
+                <div class="ruled-paper min-h-full">
+                    <div class="flex justify-between border-b border-red-200 pb-1 mb-8 text-sm label-font">
+                        <span class="text-rose-500 font-bold">Topic: Mechanism of Internet (01/05)</span>
+                        <span class="text-zinc-500 font-bold">Page 1</span>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="text-center mb-10 relative">
+                        <h2 class="text-2xl sm:text-3xl font-bold handwritten tracking-wide inline-block relative px-4" style="color: var(--ink-black); transform: rotate(-0.5deg);">
+                            HOW THE INTERNET WORKS: AN OVERVIEW
+                            <svg class="absolute bottom-[-14px] left-0 w-full h-4" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0,6 Q25,1 50,6 T100,6" fill="none" stroke="var(--red-pen)" stroke-width="2.5"></path>
+                            </svg>
+                        </h2>
+                    </div>
+
+                    <!-- Handwritten Body Content -->
+                    <div class="handwritten text-[1.125rem] space-y-8 leading-[28px] mt-4">
+                        
+                        <!-- Core Definition -->
+                        <div>
+                            <span class="handwritten-sketchy text-lg block" style="margin-bottom: -4px;">★ THE BASIC INFRASTRUCTURE:</span>
+                            <p>
+                                At a high level, the <span class="highlight">Internet</span> is a <span class="red-underline">global network of interconnected computers</span> and systems that communicate seamlessly through a standard ruleset called protocols.
+                            </p>
+                        </div>
+
+                        <!-- Interconnected routers -->
+                        <div>
+                            <span class="handwritten-bold text-lg block" style="color: var(--ink-black); margin-bottom: -4px;">🌐 The Backbone: Interconnected Routers</span>
+                            <p>
+                                The absolute core of this structure is a massive, decentralized grid of <span class="highlight">routers</span>. Their single job is directing information traffic.
+                            </p>
+                            <p class="mt-2">
+                                When you transmit data, it is instantly chopped into tiny chunks called <span class="highlight">packets</span>. Packets do NOT follow one fixed line; they flow dynamically through whatever paths are fastest!
+                            </p>
+                        </div>
+
+                        <!-- Core Hand-drawn Diagram: Router Grid Packet Flow -->
+                        <div class="my-6 flex flex-col items-center">
+                            <span class="handwritten-sketchy text-sm block mb-1">💡 Figure 1.0: Packet Swapping & Routing Pathway</span>
+                            <div class="bg-amber-50/50 p-4 border border-dashed border-amber-300 rounded-xl max-w-lg w-full shadow-inner">
+                                <svg viewBox="0 0 450 150" class="w-full">
+                                    <!-- Device A -->
+                                    <rect x="15" y="45" width="50" height="35" rx="4" fill="none" stroke="var(--ink-color)" stroke-width="2" stroke-dasharray="2 1"/>
+                                    <line x1="40" y1="80" x2="40" y2="95" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <line x1="25" y1="95" x2="55" y2="95" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="21" y="66" class="label-font" style="font-size: 9px; fill: var(--ink-color);">Host A</text>
+
+                                    <!-- Packets being broken up -->
+                                    <rect x="80" y="50" width="12" height="12" fill="none" stroke="var(--red-pen)" stroke-width="1.5"/>
+                                    <text x="82" y="60" class="label-font" style="font-size: 8px; fill: var(--red-pen);">1</text>
+                                    <rect x="85" y="68" width="12" height="12" fill="none" stroke="var(--red-pen)" stroke-width="1.5"/>
+                                    <text x="87" y="78" class="label-font" style="font-size: 8px; fill: var(--red-pen);">2</text>
+
+                                    <!-- Router Node 1 -->
+                                    <circle cx="150" cy="35" r="16" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="141" y="38" class="label-font" style="font-size: 8px;">R1</text>
+
+                                    <!-- Router Node 2 -->
+                                    <circle cx="150" cy="115" r="16" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="141" y="118" class="label-font" style="font-size: 8px;">R2</text>
+
+                                    <!-- Router Node 3 -->
+                                    <circle cx="280" cy="75" r="16" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="271" y="78" class="label-font" style="font-size: 8px;">R3</text>
+
+                                    <!-- Destination Device B -->
+                                    <rect x="370" y="45" width="50" height="35" rx="4" fill="none" stroke="var(--ink-color)" stroke-width="2" stroke-dasharray="2 1"/>
+                                    <line x1="395" y1="80" x2="395" y2="95" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <line x1="380" y1="95" x2="410" y2="95" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="376" y="66" class="label-font" style="font-size: 9px; fill: var(--ink-color);">Host B</text>
+
+                                    <!-- Routing Connections -->
+                                    <path d="M65,55 Q105,30 134,35" fill="none" stroke="var(--ink-color)" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                    <path d="M65,75 Q105,115 134,115" fill="none" stroke="var(--ink-color)" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                    <path d="M166,35 Q220,40 264,68" fill="none" stroke="var(--red-pen)" stroke-width="1.5" stroke-dasharray="4 2"/>
+                                    <path d="M166,115 Q220,110 264,82" fill="none" stroke="var(--red-pen)" stroke-width="1.5" stroke-dasharray="4 2"/>
+                                    <path d="M296,75 L370,62" fill="none" stroke="var(--ink-color)" stroke-width="1.5"/>
+
+                                    <!-- Hand written details label -->
+                                    <text x="180" y="20" class="label-font" style="font-size: 8px; fill: var(--red-pen);">Fastest Route</text>
+                                    <text x="180" y="142" class="label-font" style="font-size: 8px; fill: var(--ink-color);">Fallback Route if R1 fails</text>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Core Terminology Boxed -->
+                        <div class="hand-drawn-box" style="border-color: var(--red-pen);">
+                            <span class="handwritten-bold block" style="color: var(--red-pen);">💡 EXAM TERMS REFERENCE:</span>
+                            <ul class="list-none pl-4 space-y-1 text-sm">
+                                <li>📌 <span class="highlight">Packet</span>: Smallest unit of data transmitted over networks.</li>
+                                <li>📌 <span class="highlight">Router</span>: Device directing packets between different networks.</li>
+                                <li>📌 <span class="highlight">IP Address</span>: Unique identifier assigned to every online device.</li>
+                                <li>📌 <span class="highlight">DNS</span>: System translating domain names into IP addresses.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <!-- Marginalia Study Tip -->
+                    <div class="absolute bottom-6 right-8 w-48 p-2 bg-yellow-100 border-l-4 border-yellow-400 rotate-1 shadow-lg hidden md:block">
+                        <span class="font-bold text-xs text-yellow-800 block label-font">💡 Examiner's Tip:</span>
+                        <span class="text-xs text-zinc-800 font-medium label-font">IP routes packets, while TCP guarantees correct order delivery! Remember this contrast!</span>
+                    </div>
+
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 label-font text-zinc-400 font-bold">
+                        - 1 -
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: PROTOCOLS, IP & DNS -->
+            <div id="page-2" class="notebook-page paper-curl-shadow tilted-page-2 hidden">
+                <div class="binder-holes">
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                </div>
+
+                <div class="ruled-paper min-h-full">
+                    <div class="flex justify-between border-b border-red-200 pb-1 mb-8 text-sm label-font">
+                        <span class="text-rose-500 font-bold">Topic: Protocols, IP & DNS (02/05)</span>
+                        <span class="text-zinc-500 font-bold">Page 2</span>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="text-center mb-10 relative">
+                        <h2 class="text-2xl sm:text-3xl font-bold handwritten tracking-wide inline-block relative px-4" style="color: var(--ink-black); transform: rotate(0.6deg);">
+                            ROLE OF PROTOCOLS, IP & DNS
+                            <svg class="absolute bottom-[-14px] left-0 w-full h-4" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0,4 Q30,8 60,4 T100,8" fill="none" stroke="var(--red-pen)" stroke-width="2.2"></path>
+                            </svg>
+                        </h2>
+                    </div>
+
+                    <!-- Handwritten Body Content -->
+                    <div class="handwritten text-[1.125rem] space-y-8 leading-[28px] mt-4">
+                        
+                        <!-- Role of protocols -->
+                        <div>
+                            <span class="handwritten-sketchy text-lg block" style="margin-bottom: -4px;">★ PROTOCOLS: THE GLUE</span>
+                            <p>
+                                A <span class="highlight">Protocol</span> is an agreed set of rules and standards defining how information is exchanged. Without them, devices from different companies couldn't communicate!
+                            </p>
+                        </div>
+
+                        <!-- IP & DNS -->
+                        <div>
+                            <span class="handwritten-bold text-lg block" style="color: var(--ink-black); margin-bottom: -4px;">📌 IP Addresses vs. Domain Names</span>
+                            <p>
+                                Computers find each other using <span class="red-underline">IP Addresses</span>. An IP is a unique numerical label.
+                            </p>
+                            <p class="mt-2">
+                                • <span class="handwritten-bold">IPv4 Address</span>: E.g., <span class="highlight">192.168.1.1</span> (Four numbers divided by dots).
+                            </p>
+                            <p>
+                                • <span class="handwritten-bold">IPv6 Address</span>: Hexadecimal format for modern vast scales.
+                            </p>
+                            <p class="mt-2">
+                                Humans cannot easily memorize numeric strings. Therefore, we use <span class="highlight">domain names</span> (e.g., <code class="bg-zinc-100 px-1 rounded text-rose-600">google.com</code>) to alias numeric IPs.
+                            </p>
+                        </div>
+
+                        <!-- DNS Diagram Sketch -->
+                        <div class="my-6 flex flex-col items-center">
+                            <span class="handwritten-sketchy text-sm block mb-1">💡 Figure 2.0: Domain Name System Translation Loop</span>
+                            <div class="bg-blue-50/50 p-4 border border-dashed border-blue-300 rounded-xl max-w-lg w-full shadow-inner">
+                                <svg viewBox="0 0 400 150" class="w-full">
+                                    <!-- Browser / Client -->
+                                    <rect x="20" y="55" width="70" height="40" rx="3" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="32" y="78" class="label-font" style="font-size: 8px;">Your Web</text>
+                                    <text x="34" y="88" class="label-font" style="font-size: 8px;">Browser</text>
+
+                                    <!-- DNS Server -->
+                                    <rect x="290" y="15" width="85" height="40" rx="3" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="298" y="38" class="label-font" style="font-size: 9px; fill: var(--ink-color);">DNS Server</text>
+
+                                    <!-- Real Web Server -->
+                                    <rect x="290" y="95" width="85" height="40" rx="3" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="298" y="118" class="label-font" style="font-size: 9px; fill: var(--red-pen);">Web Server</text>
+
+                                    <!-- Arrow 1: Query -->
+                                    <path d="M90,65 Q190,35 280,35" fill="none" stroke="var(--red-pen)" stroke-width="1.5" stroke-dasharray="3 2"/>
+                                    <text x="120" y="38" class="label-font text-rose-600" style="font-size: 7px; fill: var(--red-pen);">1. What is google.com?</text>
+
+                                    <!-- Arrow 2: Response -->
+                                    <path d="M280,45 Q190,55 90,72" fill="none" stroke="var(--ink-color)" stroke-width="1.5"/>
+                                    <text x="120" y="62" class="label-font" style="font-size: 7px;">2. IP is 142.250.190.78</text>
+
+                                    <!-- Arrow 3: Direct Connect -->
+                                    <path d="M90,85 Q190,115 280,115" fill="none" stroke="var(--red-pen)" stroke-width="1.5"/>
+                                    <text x="120" y="110" class="label-font" style="font-size: 7px; fill: var(--red-pen);">3. Get Website files!</text>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- DNS Fact Box -->
+                        <div>
+                            <p>
+                                The <span class="red-circle"><span class="handwritten-bold">DNS Server</span></span> is the "Phonebook of the Internet". When you enter a domain, your browser sends a DNS query, fetches the numeric address, then negotiates content directly with the Web Server.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 label-font text-zinc-400 font-bold">
+                        - 2 -
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 3: THREE PILLARS & WEB LINKS -->
+            <div id="page-3" class="notebook-page paper-curl-shadow tilted-page-3 hidden">
+                <div class="binder-holes">
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                </div>
+
+                <div class="ruled-paper min-h-full">
+                    <div class="flex justify-between border-b border-red-200 pb-1 mb-8 text-sm label-font">
+                        <span class="text-rose-500 font-bold">Topic: Three Pillars & Web Links (03/05)</span>
+                        <span class="text-zinc-500 font-bold">Page 3</span>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="text-center mb-10 relative">
+                        <h2 class="text-2xl sm:text-3xl font-bold handwritten tracking-wide inline-block relative px-4" style="color: var(--ink-black); transform: rotate(-0.3deg);">
+                            THE THREE PILLARS & HYPERLINKS
+                            <svg class="absolute bottom-[-14px] left-0 w-full h-4" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0,5 Q25,2 50,5 T100,2" fill="none" stroke="var(--red-pen)" stroke-width="2.4"></path>
+                            </svg>
+                        </h2>
+                    </div>
+
+                    <!-- Handwritten Body Content -->
+                    <div class="handwritten text-[1.125rem] space-y-8 leading-[28px] mt-4">
+                        
+                        <!-- Three Pillars of Web -->
+                        <div>
+                            <span class="handwritten-sketchy text-lg block" style="margin-bottom: -4px;">★ TIM BERNERS-LEE'S THREE PILLARS (1989)</span>
+                            <p>
+                                The World Wide Web stands securely on <span class="highlight">three major pillars</span>:
+                            </p>
+                            <ol class="list-none pl-6 space-y-1">
+                                <li>👉 <span class="handwritten-bold">1. URL</span>: An address system keeping track of documents.</li>
+                                <li>👉 <span class="handwritten-bold">2. HTTP</span>: The transfer protocol to fetch these documents.</li>
+                                <li>👉 <span class="highlight">3. HTML</span>: The document structure supporting hyperlinks.</li>
+                            </ol>
+                        </div>
+
+                        <!-- Hyperlinks Revolution -->
+                        <div>
+                            <span class="handwritten-bold text-lg block" style="color: var(--ink-black); margin-bottom: -4px;">🔗 Hyperlinks: The Web's Catalyst</span>
+                            <p>
+                                Before the Web, finding files was difficult. <span class="highlight">Hyperlinks</span> revolutionized everything by correlating a text string with a precise URL, letting users jump instantly across files!
+                            </p>
+                        </div>
+
+                        <!-- Types of Links Breakdown Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="hand-drawn-box" style="border-color: var(--ink-color);">
+                                <span class="handwritten-bold text-sm block" style="color: var(--ink-color);">📂 INTERNAL LINKS:</span>
+                                <p class="text-sm leading-6">
+                                    Connects two webpages belonging to the <span class="red-underline">same website</span>. Key to smooth navigation.
+                                </p>
+                            </div>
+                            <div class="hand-drawn-box" style="border-color: var(--red-pen);">
+                                <span class="handwritten-bold text-sm block" style="color: var(--red-pen);">📂 EXTERNAL LINKS:</span>
+                                <p class="text-sm leading-6">
+                                    Connects your webpage to <span class="highlight">someone else's website</span>. Essential to linking the global web.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Anchors and incoming -->
+                        <div class="space-y-4">
+                            <p>
+                                • <span class="handwritten-bold">Incoming Links</span>: Links pointing *to* your site from external domains (critical for Search Engine Optimization!).
+                            </p>
+                            <p>
+                                • <span class="highlight">Anchors</span>: Tie sections of <span class="red-underline">one single document</span> together. Clicking jumps immediately inside the same page without refreshing.
+                            </p>
+                        </div>
+
+                        <!-- Mini Anchor diagram -->
+                        <div class="my-4 bg-amber-50/50 p-2 border border-dashed border-amber-300 rounded-lg text-center max-w-sm mx-auto">
+                            <span class="label-font text-xs text-rose-700 block">Anchor Mechanics Sketch:</span>
+                            <span class="label-font text-[11px] block text-zinc-600 mt-1">
+                                [Click Element] &rarr; browser matches ID #section &rarr; scrolls target instantly!
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 label-font text-zinc-400 font-bold">
+                        - 3 -
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 4: URL ANATOMY & SEMANTICS -->
+            <div id="page-4" class="notebook-page paper-curl-shadow tilted-page-4 hidden">
+                <div class="binder-holes">
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                </div>
+
+                <div class="ruled-paper min-h-full">
+                    <div class="flex justify-between border-b border-red-200 pb-1 mb-8 text-sm label-font">
+                        <span class="text-rose-500 font-bold">Topic: URL Anatomy & Semantics (04/05)</span>
+                        <span class="text-zinc-500 font-bold">Page 4</span>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="text-center mb-10 relative">
+                        <h2 class="text-2xl sm:text-3xl font-bold handwritten tracking-wide inline-block relative px-4" style="color: var(--ink-black); transform: rotate(0.4deg);">
+                            ANATOMY OF A URL & SEMANTICS
+                            <svg class="absolute bottom-[-14px] left-0 w-full h-4" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0,6 Q35,2 70,6 T100,4" fill="none" stroke="var(--red-pen)" stroke-width="2.3"></path>
+                            </svg>
+                        </h2>
+                    </div>
+
+                    <!-- Handwritten Body Content -->
+                    <div class="handwritten text-[1.125rem] space-y-8 leading-[28px] mt-4">
+                        
+                        <!-- URL Intro -->
+                        <div>
+                            <span class="handwritten-sketchy text-lg block" style="margin-bottom: -4px;">★ WHAT IS A URL?</span>
+                            <p>
+                                A <span class="highlight">URL (Uniform Resource Locator)</span> is the unique address of a published document or media file on the web.
+                            </p>
+                        </div>
+
+                        <!-- URL Anatomy Sketch -->
+                        <div class="my-6">
+                            <span class="handwritten-bold text-base block" style="color: var(--ink-black);">🔬 Anatomy Breakdown:</span>
+                            <div class="bg-blue-50/50 p-4 border border-dashed border-blue-300 rounded-xl overflow-x-auto text-center mt-2">
+                                <code class="text-sm font-bold text-blue-900 block font-mono">https://www.example.com:80/path/file.html?key=val#section</code>
+                                <div class="grid grid-cols-5 gap-1 mt-4 text-[10px] label-font text-zinc-600">
+                                    <div class="border-t border-rose-400 pt-1">
+                                        <span class="text-rose-600 font-bold">Scheme</span><br>HTTPS / HTTP
+                                    </div>
+                                    <div class="border-t border-indigo-400 pt-1">
+                                        <span class="text-indigo-600 font-bold">Domain</span><br>example.com
+                                    </div>
+                                    <div class="border-t border-emerald-400 pt-1">
+                                        <span class="text-emerald-600 font-bold">Port</span><br>80 / 443
+                                    </div>
+                                    <div class="border-t border-purple-400 pt-1">
+                                        <span class="text-purple-600 font-bold">Path</span><br>/path/file.html
+                                    </div>
+                                    <div class="border-t border-amber-400 pt-1">
+                                        <span class="text-amber-600 font-bold">Params & Anchor</span><br>?key=val & #section
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Postal Mail Analogy -->
+                        <div class="hand-drawn-box" style="border-color: var(--red-pen);">
+                            <span class="handwritten-bold text-sm block" style="color: var(--red-pen);">📬 Real-World Analogy (Postal Mail):</span>
+                            <ul class="list-none pl-4 text-sm space-y-1">
+                                <li>📬 <span class="highlight">Scheme</span>: The delivery postal service used.</li>
+                                <li>📬 <span class="highlight">Domain Name</span>: The city or town of destination.</li>
+                                <li>📬 <span class="highlight">Port</span>: Zip code (technical gateway).</li>
+                                <li>📬 <span class="highlight">Path</span>: The building where mail is dropped off.</li>
+                                <li>📬 <span class="highlight">Anchor</span>: The specific recipient room inside.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Semantic URLs -->
+                        <div>
+                            <span class="handwritten-bold text-lg block" style="color: var(--ink-black); margin-bottom: -4px;">🌱 Semantic URLs (Best Practice)</span>
+                            <p>
+                                Always use <span class="red-underline">words with inherent meaning</span> (e.g., <code class="bg-zinc-100 px-1 rounded text-emerald-600">.../Learn_web_development</code>) rather than a soup of random characters! They improve accessibility, usability, and classification of websites in search engines.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 label-font text-zinc-400 font-bold">
+                        - 4 -
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 5: WEB SERVERS, INTRANET & EXTRANET -->
+            <div id="page-5" class="notebook-page paper-curl-shadow tilted-page-5 hidden">
+                <div class="binder-holes">
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                    <div class="binder-hole"></div>
+                </div>
+
+                <div class="ruled-paper min-h-full">
+                    <div class="flex justify-between border-b border-red-200 pb-1 mb-8 text-sm label-font">
+                        <span class="text-rose-500 font-bold">Topic: Web Servers & Private Nets (05/05)</span>
+                        <span class="text-zinc-500 font-bold">Page 5</span>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="text-center mb-10 relative">
+                        <h2 class="text-2xl sm:text-3xl font-bold handwritten tracking-wide inline-block relative px-4" style="color: var(--ink-black); transform: rotate(-0.4deg);">
+                            WEB SERVERS, INTRANETS & EXTRANETS
+                            <svg class="absolute bottom-[-14px] left-0 w-full h-4" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0,5 Q25,0 50,5 T100,5" fill="none" stroke="var(--red-pen)" stroke-width="2.5"></path>
+                            </svg>
+                        </h2>
+                    </div>
+
+                    <!-- Handwritten Body Content -->
+                    <div class="handwritten text-[1.125rem] space-y-8 leading-[28px] mt-4">
+                        
+                        <!-- Web Servers Dual Concept -->
+                        <div>
+                            <span class="handwritten-sketchy text-lg block" style="margin-bottom: -4px;">★ WEB SERVERS: HARDWARE vs. SOFTWARE</span>
+                            <p>
+                                A Web Server refers to <span class="highlight">two things working together</span>:
+                            </p>
+                            <p class="mt-2 pl-4">
+                                • <span class="handwritten-bold">1. Hardware</span>: A dedicated, always-on computer storing your files (HTML docs, CSS, media).
+                            </p>
+                            <p class="pl-4">
+                                • <span class="handwritten-bold">2. Software</span>: At a minimum, an <span class="highlight">HTTP Server</span> that processes incoming requests and delivers pages.
+                            </p>
+                        </div>
+
+                        <!-- Static vs Dynamic -->
+                        <div>
+                            <p>
+                                👉 <span class="red-underline">Static Web Server</span>: Delivers hosted files exactly "as-is" to your browser.
+                            </p>
+                            <p>
+                                👉 <span class="highlight">Dynamic Web Server</span>: Updates files "on-the-fly" using databases and template engines before sending them out.
+                            </p>
+                        </div>
+
+                        <!-- Intranets and Extranets Concluding Diagram -->
+                        <div class="my-6">
+                            <span class="handwritten-sketchy text-sm block mb-1 text-center">💡 Figure 5.0: Concentric Access Scope Diagram</span>
+                            <div class="bg-amber-50/50 p-4 border border-dashed border-amber-300 rounded-xl max-w-sm mx-auto shadow-inner">
+                                <svg viewBox="0 0 200 200" class="w-full max-w-[200px] mx-auto">
+                                    <!-- Outermost: Internet -->
+                                    <circle cx="100" cy="100" r="95" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="73" y="24" class="label-font" style="font-size: 9px; fill: var(--ink-color);">Internet (Global)</text>
+
+                                    <!-- Middle: Extranet -->
+                                    <circle cx="100" cy="100" r="65" fill="none" stroke="var(--red-pen)" stroke-width="2" stroke-dasharray="3 3"/>
+                                    <text x="63" y="60" class="label-font" style="font-size: 8px; fill: var(--red-pen);">Extranet (Partners)</text>
+
+                                    <!-- Innermost: Intranet -->
+                                    <circle cx="100" cy="100" r="35" fill="none" stroke="var(--ink-color)" stroke-width="2"/>
+                                    <text x="70" y="103" class="label-font" style="font-size: 8px;">Intranet</text>
+                                    <text x="72" y="113" class="label-font" style="font-size: 7px;">(Staff Only)</text>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Private Networks Summary Table -->
+                        <div class="hand-drawn-box" style="border-color: var(--ink-color);">
+                            <span class="handwritten-bold text-sm block" style="color: var(--ink-color);">🔒 Private Network Scopes:</span>
+                            <ul class="list-none pl-4 text-xs space-y-1">
+                                <li>🚀 <span class="highlight">Intranets</span>: Strictly restricted to members of a single organization.</li>
+                                <li>🚀 <span class="highlight">Extranets</span>: Opens a portion of private networks to trusted partners (suppliers, customers).</li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 label-font text-zinc-400 font-bold">
+                        - 5 -
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <footer class="text-center text-xs text-slate-600 mt-12 pb-6">
+        Study revision aid modeled perfectly on standard syllabus notes. Custom SVG sketches and interactive scripts built for classroom environments.
+    </footer>
+
+    <!-- Interaction and State Scripts -->
+    <script>
+        let currentInk = 'blue';
+        let studyModeActive = false;
+        let isScanMode = false;
+        let currentPageNum = 1;
+        const totalPages = 5;
+
+        // Ink Selector Switcher
+        function setInk(color) {
+            currentInk = color;
+            const root = document.documentElement;
+            
+            if (color === 'blue') {
+                root.style.setProperty('--ink-color', '#1c3d70');
+            } else if (color === 'black') {
+                root.style.setProperty('--ink-color', '#212529');
+            } else if (color === 'violet') {
+                root.style.setProperty('--ink-color', '#4a154b');
+            }
+
+            const buttons = ['blue', 'black', 'violet'];
+            buttons.forEach(btn => {
+                const el = document.getElementById(`btn-ink-${btn}`);
+                if (btn === color) {
+                    el.classList.add('scale-110', 'border-white');
+                    el.classList.remove('border-slate-600');
+                } else {
+                    el.classList.remove('scale-110', 'border-white');
+                    el.classList.add('border-slate-600');
+                }
+            });
+        }
+
+        // Dropdown Page Router
+        function switchPage(pageNum) {
+            currentPageNum = pageNum;
+            document.getElementById('page-select').value = pageNum;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const el = document.getElementById(`page-${i}`);
+                if (i === pageNum) {
+                    el.classList.remove('hidden');
+                    el.classList.add('block');
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('block');
+                }
+            }
+        }
+
+        // Navigator Controls (&larr; / &rarr;)
+        function navigatePage(direction) {
+            let targetPage = currentPageNum + direction;
+            if (targetPage >= 1 && targetPage <= totalPages) {
+                switchPage(targetPage);
+            }
+        }
+
+        // Active Recall Toggle
+        function toggleStudyMode() {
+            studyModeActive = !studyModeActive;
+            const btn = document.getElementById('study-toggle');
+
+            for (let i = 1; i <= totalPages; i++) {
+                const el = document.getElementById(`page-${i}`);
+                if (studyModeActive) {
+                    el.classList.add('study-hide');
+                } else {
+                    el.classList.remove('study-hide');
+                }
+            }
+
+            if (studyModeActive) {
+                btn.innerHTML = "💡 Active Recall: ON";
+                btn.classList.add('bg-green-500', 'hover:bg-green-400');
+                btn.classList.remove('bg-yellow-500', 'hover:bg-yellow-400');
+            } else {
+                btn.innerHTML = "💡 Active Recall: OFF";
+                btn.classList.remove('bg-green-500', 'hover:bg-green-400');
+                btn.classList.add('bg-yellow-500', 'hover:bg-yellow-400');
+            }
+        }
+
+        // Tap highlight to reveal
+        document.addEventListener('click', function(e) {
+            if (studyModeActive && e.target.classList.contains('highlight')) {
+                e.target.style.background = 'rgba(253, 224, 71, 0.9)';
+                e.target.style.color = 'inherit';
+            }
+        });
+
+        // Toggle Flat Scan Paper Layout (Centering and removing rotates for clean pdf printouts)
+        function toggleScanLook() {
+            isScanMode = !isScanMode;
+            const toggleBtn = document.getElementById('scan-toggle');
+
+            for (let i = 1; i <= totalPages; i++) {
+                const page = document.getElementById(`page-${i}`);
+                if (isScanMode) {
+                    page.classList.remove(`tilted-page-${i}`, 'paper-curl-shadow');
+                    page.style.transform = 'none';
+                    page.style.borderRadius = '0px';
+                } else {
+                    page.style.borderRadius = '';
+                    page.classList.add(`tilted-page-${i}`, 'paper-curl-shadow');
+                    page.style.transform = '';
+                }
+            }
+
+            if (isScanMode) {
+                toggleBtn.classList.add('bg-purple-600', 'text-white', 'border-purple-500');
+                toggleBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            } else {
+                toggleBtn.classList.remove('bg-purple-600', 'text-white', 'border-purple-500');
+                toggleBtn.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            }
+        }
+    </script>
+</body>
+</html>
